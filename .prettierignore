@@ -1,0 +1,26 @@
+# build outputs
+dist
+build
+
+# node modules
+node_modules
+
+# prisma generate files
+prisma_client
+
+# environment files
+.env
+.env.*
+
+# lock files
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+.DS_Store
+.vscode
+
+# generated files or assets
+*.log
+coverage
+public

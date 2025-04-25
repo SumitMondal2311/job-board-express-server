@@ -1,0 +1,116 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../prisma_client"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  Job_Seeker
+  Recruiter_Head
+  Recruiter
+}
+
+model User {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  isAuthByGoogle Boolean  @default(false)
+  fullName       String
+  role           Role     @default(Job_Seeker)
+  email          String   @unique
+  password       String?
+  profileImage   String?
+  bio            String?
+  createdAt      DateTime @default(now())
+
+  recruiterHeads     Company[]
+  membershipRequests RecruiterMembership[]
+  jobs               Job[]
+  applications       Application[]
+}
+
+model Company {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  name      String
+  slug      String   @unique
+  logo      String?  @unique
+  about     String
+  createdAt DateTime @default(now())
+
+  membershipRequests RecruiterMembership[]
+  jobs               Job[]
+
+  recruiterHead   User   @relation(fields: [recruiterHeadId], references: [id], onDelete: Cascade)
+  recruiterHeadId String @map("recruiterHead") @db.ObjectId
+
+  @@index([recruiterHeadId])
+}
+
+enum MembershipStatus {
+  Approved
+  Pending
+  Rejected
+}
+
+model RecruiterMembership {
+  id     String           @id @default(auto()) @map("_id") @db.ObjectId
+  status MembershipStatus @default(Pending)
+
+  recruiter   User    @relation(fields: [recruiterId], references: [id], onDelete: Cascade)
+  recruiterId String  @map("recruiter") @db.ObjectId
+  company     Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId   String  @map("company") @db.ObjectId
+
+  @@unique([recruiterId, companyId])
+  @@index([companyId])
+  @@index([recruiterId])
+}
+
+model Job {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  title            String
+  description      String
+  minSalary        Int
+  maxSalary        Int
+  requiredSkills   String[]
+  location         String
+  isRemoteEligible Boolean  @default(false)
+  isApproved       Boolean  @default(false)
+  isIntakeOpen     Boolean  @default(false)
+  createdAt        DateTime @default(now()) @updatedAt
+
+  applications Application[]
+
+  recruiter   User    @relation(fields: [recruiterId], references: [id], onDelete: Cascade)
+  recruiterId String  @map("recruiter") @db.ObjectId
+  company     Company @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  companyId   String  @map("company") @db.ObjectId
+
+  @@index([recruiterId])
+}
+
+enum ApplicationStatus {
+  Shortlisted
+  Pending
+  Rejected
+}
+
+model Application {
+  id          String            @id @default(auto()) @map("_id") @db.ObjectId
+  resume      String
+  coverLetter String
+  status      ApplicationStatus @default(Pending)
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  jobSeeker   User   @relation(fields: [jobSeekerId], references: [id], onDelete: Cascade)
+  jobSeekerId String @map("jobSeeker") @db.ObjectId
+  job         Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  jobId       String @map("job") @db.ObjectId
+
+  @@unique([jobSeekerId, jobId])
+  @@index([jobId])
+  @@index([jobSeekerId])
+}
