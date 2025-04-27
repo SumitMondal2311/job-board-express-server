@@ -1,3 +1,3 @@
 import { env } from './env.config';
 
-export const GOOGLE_REDIRECT_URL = `http://localhost:${env.PORT}/api/auth/google/callback`;
+export const GOOGLE_REDIRECT_URI = `http://localhost:${env.PORT}/api/auth/google/callback`;

@@ -1,6 +1,6 @@
 import { Request, Response, Router } from 'express';
 import { env } from '../configs/env.config';
-import { GOOGLE_REDIRECT_URL } from '../configs/oauth2.config';
+import { GOOGLE_REDIRECT_URI } from '../configs/oauth2.config';
 import {
     googleOAuth,
     login,
@@ -18,7 +18,7 @@ router.post('/signup', authRateLimiter, handleAsync(signup));
 router.post('/login', authRateLimiter, handleAsync(login));
 router.get('/google', (_req: Request, res: Response) => {
     res.redirect(
-        `https://accounts.google.com/o/oauth2/v2/auth?client_id=${env.GOOGLE_CLIENT_ID}&redirect_uri=https${GOOGLE_REDIRECT_URL}&response_type=code&scope=email%20profile`
+        `https://accounts.google.com/o/oauth2/v2/auth?client_id=${env.GOOGLE_CLIENT_ID}&redirect_uri=${GOOGLE_REDIRECT_URI}&response_type=code&scope=email%20profile`
     );
 });
 router.get('/google/callback', handleAsync(googleOAuth));

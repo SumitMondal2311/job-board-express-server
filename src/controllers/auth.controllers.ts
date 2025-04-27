@@ -6,6 +6,7 @@ import {
     ACCESS_TOKEN_EXPIRY,
     REFRESH_TOKEN_EXPIRY,
 } from '../configs/jwt.config';
+import { GOOGLE_REDIRECT_URI } from '../configs/oauth2.config';
 import { SESSION_PREFIX, USER_CACHE_PREFIX } from '../configs/redis.config';
 import { prisma } from '../lib/prisma';
 import { redis } from '../lib/redis-client';
@@ -208,7 +209,7 @@ export const googleOAuth = async (req: Request, res: Response) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-            redirect_uri: `http://localhost:${env.PORT}/api/auth/google/callback`,
+            redirect_uri: GOOGLE_REDIRECT_URI,
             client_id: env.GOOGLE_CLIENT_ID,
             client_secret: env.GOOGLE_CLIENT_SECRET,
             code: googleOAuth2Code,
@@ -307,7 +308,7 @@ export const googleOAuth = async (req: Request, res: Response) => {
         res
     );
 
-    res.redirect(`${env.FRONTEND_URL}/oauth2-redirect`);
+    res.redirect(`${env.FRONTEND_URL}/auth/oauth2`);
 };
 
 export const refreshToken = async (req: Request, res: Response) => {
