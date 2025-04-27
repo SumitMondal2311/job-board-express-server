@@ -21,7 +21,10 @@ export default [
         rules: {
             '@typescript-eslint/no-unused-vars': [
                 'warn',
-                { argsIgnorePattern: '^_' },
+                {
+                    argsIgnorePattern: '^_',
+                    varsIgnorePattern: '^_',
+                },
             ],
             '@typescript-eslint/explicit-function-return-type': 'off',
             'prettier/prettier': 'warn',

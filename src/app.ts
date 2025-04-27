@@ -7,7 +7,9 @@ import express, { NextFunction, Request, Response } from 'express';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import { env } from './configs/env.config';
-import logger from './lib/winston';
+import { morganStream } from './lib/morgan-stream';
+import { appLogger } from './lib/winston';
+import { router as authRouter } from './routes/auth.routes';
 import { Error } from './types/error.type';
 
 export const app = express();
@@ -18,9 +20,12 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(helmet());
 app.use(morgan('dev'));
+app.use(morgan('combined', { stream: morganStream }));
 
-app.use((err: Error, req: Request, res: Response, _next: NextFunction) => {
-    logger.error(err);
+app.use('/api/auth', authRouter);
+
+app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
+    appLogger.error(err);
 
     res.status(err.status || 500).json({
         message: err.message || 'Internal server error',
